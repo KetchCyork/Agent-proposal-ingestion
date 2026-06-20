@@ -1,64 +1,60 @@
-# agent-memory-mesh
+﻿# Agent Memory Mesh
 
-A shared, local-first **memory brain for AI agents** — one knowledge layer that
-every agent, on every machine, can read. Obsidian is the durable store; LanceDB
-provides hybrid (semantic + keyword) retrieval; embeddings run locally via Ollama;
-and the brain is served over **HTTP and MCP** across a **Tailscale** mesh.
+This repository provides the shared memory brain and remote ingestion support for the cross-machine Agent OS ecosystem.
 
-It fills the biggest gap in [Paperclip](https://github.com/paperclipai/paperclip)
-(memory/knowledge is on its roadmap, not yet built) and works with any agent —
-inside Paperclip or not.
+It is designed to make memory available across machines using a local-first hybrid architecture, with Obsidian for durable notes, LanceDB for hybrid retrieval, and Ollama for local embeddings.
 
-## Why
+## What this repo does
 
-Agents forget. Pasting whole vaults into prompts doesn't scale and doesn't work
-across models. The fix is to keep memory **outside** the models and let each agent
-retrieve only the relevant slice at query time — so the same brain serves Claude,
-a local model, Hermes, anything. See `docs/MEMORY.md`.
+- Loads content from an Obsidian vault.
+- Indexes documents, proposals, and connector-derived source content.
+- Builds local embeddings and stores them in LanceDB.
+- Serves memory via HTTP and MCP so any agent can query the shared brain.
+- Supports remote memory ingestion from other machines over a secure mesh.
+- Includes Tailscale integration for secure cross-machine connectivity.
 
-## What's here
+## Capabilities
 
-- `src/memory/` — vault loader, local embeddings, LanceDB hybrid store, indexer
-- `src/service/` — the engine plus an **HTTP API** and an **MCP server**
-- `src/cli/` — `index` (vault), `ingest` (documents/proposals), `learn-style`, `serve`
-- `src/sources/` — docx/pdf/txt extraction + directory ingestion
-- `src/style/` — derive a proposals-style profile from indexed proposals
-- `docs/TAILSCALE.md` — the mesh fabric + a locked-down ACL
-- `docs/INTEGRATION.md` — how Paperclip/agents use it (MCP + HTTP)
-- `tailscale/acl.hujson` — ready-to-paste access policy
+- Vault indexing and hybrid search.
+- Remote source ingestion support.
+- Memory search API for agents and dashboards.
+- HTTP and MCP access for agent integration.
+- Provenance metadata for auditability.
 
-## Quickstart
+## Installation
 
 ```bash
-cp .env.example .env          # set VAULT_PATH (and MEMORY_HOST/KEY to share)
+cd "Mesh runner proposal ingestion"
+cp .env.example .env
 npm install
-ollama pull nomic-embed-text  # local, private embeddings
-npm run index                 # build the brain from your vault
-npm run ingest -- "/path/to/Proposals" --type proposal --source onedrive
-npm run learn-style           # derive 10-Profiles/proposals-style.md
-npm run serve                 # HTTP API on :8377
-# or: npm run serve:mcp       # MCP stdio server for a co-located agent
 ```
 
-Then follow `docs/TAILSCALE.md` to share it across your machines, and
-`docs/INTEGRATION.md` to wire agents in.
-
-## Make it yours (clean GitHub authoring history)
-
-This ships without git history so your first commit is authored by **you**:
+Configure `.env` with your Obsidian vault path and optional `MEMORY_HOST` / `MEMORY_API_KEY` values.
 
 ```bash
-cd agent-memory-mesh
-git init
-git config user.name  "Your Name"
-git config user.email "you@example.com"
-git add -A
-git commit -m "Initial commit: agent memory mesh"
-# create an empty repo on GitHub under your account, then:
-git remote add origin git@github.com:<you>/agent-memory-mesh.git
-git push -u origin main
+npm run index
+npm run serve
 ```
 
-## License
+To run the MCP server locally:
 
-MIT (recommended) — add a `LICENSE` file with your name as copyright holder.
+```bash
+npm run serve:mcp
+```
+
+## Documentation
+
+- `docs/TAILSCALE.md` — secure mesh setup and ACLs.
+- `docs/INTEGRATION.md` — how agents connect via HTTP and MCP.
+- `INGESTION.md` — document ingestion patterns and remote source workflows.
+
+## Usage
+
+Use this service as the shared brain for Agent OS and remote nodes. Remote machines can ingest OneDrive/M365 and other source metadata into the brain without copying raw files to the host.
+
+## Notes
+
+This repo is part of the broader cross-machine solution:
+- `Agent OS` hosts the dashboard and agent runtime.
+- `Agent Memory` is the shared memory brain.
+- `paperclip-mesh-runner` handles remote capability nodes.
