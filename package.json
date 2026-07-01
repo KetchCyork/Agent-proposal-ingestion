@@ -1,15 +1,16 @@
 {
-  "name": "agent-memory-mesh",
+  "name": "agent-proposal-ingestion",
   "version": "0.1.0",
-  "description": "A shared, local-first memory brain for AI agents across machines. Obsidian + LanceDB hybrid retrieval, served over HTTP and MCP across a Tailscale mesh.",
+  "description": "Proposal document ingestion pipeline — reads local OneDrive-synced files and indexes them into the shared memory brain.",
   "type": "module",
   "scripts": {
+    "ingest-remote": "tsx src/cli/ingest-remote.ts",
+    "ingest": "tsx src/cli/ingest.ts",
+    "learn-style": "tsx src/cli/learn-style.ts",
     "index": "tsx src/cli/index.ts",
     "serve": "tsx src/cli/serve.ts",
     "serve:mcp": "tsx src/cli/serve.ts --mcp",
-    "typecheck": "tsc --noEmit",
-    "ingest": "tsx src/cli/ingest.ts",
-    "learn-style": "tsx src/cli/learn-style.ts"
+    "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">=18"
