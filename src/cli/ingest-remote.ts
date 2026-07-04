@@ -3,7 +3,7 @@
  * to the remote memory brain (agent-memory-mesh on HQ). No local Ollama needed.
  *
  * Usage:
- *   npm run ingest-remote -- "D:\OneDrive\Proposals" [--source onedrive] [--type proposal] [--tags "sap proposal"]
+ *   npm run ingest-remote -- "D:\\OneDrive\\Proposals" [--source onedrive] [--type proposal] [--tags "sap proposal"]
  *
  * Required env vars (set in .env):
  *   MEMORY_URL      e.g. http://100.74.9.120:8377
@@ -11,10 +11,10 @@
  */
 import "dotenv/config";
 import { readdir } from "node:fs/promises";
-import { join, basename, relative } from "node:path";
+import { join, relative } from "node:path";
 import { extractDocText, isSupported } from "../sources/documents.js";
 
-const MEMORY_URL = (process.env.MEMORY_URL ?? "").replace(/\/$/, "");
+const MEMORY_URL = (process.env.MEMORY_URL ?? "").replace(/\/+$/, "");
 const MEMORY_API_KEY = process.env.MEMORY_API_KEY ?? "";
 
 function flag(name: string): string | undefined {
@@ -75,7 +75,8 @@ async function main() {
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    const name = relative(dir, file);
+    const rel = relative(dir, file);
+    const name = rel.split("\\").join("/");
     const progress = `[${i + 1}/${files.length}]`;
     try {
       const text = await extractDocText(file);
@@ -84,7 +85,8 @@ async function main() {
         skipped++;
         continue;
       }
-      const notePath = `${source}/${name.replace(/\/g, "/").replace(/\.[^.]+$/, "")}`;
+      const ext = name.lastIndexOf(".");
+      const notePath = `${source}/${ext > 0 ? name.slice(0, ext) : name}`;
       const result = await postIngest(text, notePath, source, type, tags);
       console.log(`${progress} ok    ${name}  (${result.chunks} chunks)`);
       ingested++;
