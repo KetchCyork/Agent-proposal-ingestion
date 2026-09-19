@@ -17,7 +17,10 @@ personal Mac. Embeddings are computed locally via Ollama.
 npm run ingest -- "C:\\Users\\you\\OneDrive - TSP\\Proposals" --type proposal --source onedrive --tags "sap proposal"
 ```
 
-- Supported formats: `.docx`, `.pdf`, `.txt`, `.md` (extensible in `src/sources/documents.ts`).
+- Supported formats: `.docx`, `.pptx`, `.pdf`, `.txt`, `.md` (extensible in `src/sources/documents.ts`).
+- `.pptx` extraction reads each slide in order and includes speaker notes, which in
+  proposal decks often carry the narrative the slide only gestures at. Slides with no
+  text (image-only) are skipped rather than stored empty.
 - Re-running is safe: each file's chunks are replaced, not duplicated.
 - Office lock files (`~$...`) and dotfiles are skipped automatically.
 

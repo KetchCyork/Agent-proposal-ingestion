@@ -4,6 +4,7 @@
  * Pulls plain text out of the formats proposals actually live in, so they can be
  * chunked, embedded, and indexed alongside your notes. Pure-JS, ESM-friendly:
  *   - .docx via mammoth
+ *   - .pptx via ./pptx (ZIP + <a:t> runs, including speaker notes)
  *   - .pdf  via unpdf (pdf.js under the hood)
  *   - .txt / .md read directly
  */
@@ -11,8 +12,9 @@ import { readFile } from "node:fs/promises";
 import { extname } from "node:path";
 import mammoth from "mammoth";
 import { extractText, getDocumentProxy } from "unpdf";
+import { extractPptxText } from "./pptx.js";
 
-export const SUPPORTED_EXTENSIONS = [".docx", ".pdf", ".txt", ".md"];
+export const SUPPORTED_EXTENSIONS = [".docx", ".pptx", ".pdf", ".txt", ".md"];
 
 export function isSupported(path: string): boolean {
   return SUPPORTED_EXTENSIONS.includes(extname(path).toLowerCase());
@@ -26,6 +28,8 @@ export async function extractDocText(path: string): Promise<string> {
       const result = await mammoth.extractRawText({ path });
       return (result.value ?? "").trim();
     }
+    case ".pptx":
+      return await extractPptxText(path);
     case ".pdf": {
       const buf = await readFile(path);
       const pdf = await getDocumentProxy(new Uint8Array(buf));
