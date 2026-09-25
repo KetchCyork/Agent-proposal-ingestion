@@ -17,6 +17,19 @@ personal Mac. Embeddings are computed locally via Ollama.
 npm run ingest -- "C:\\Users\\you\\OneDrive - TSP\\Proposals" --type proposal --source onedrive --tags "sap proposal"
 ```
 
+- `--changed-only` ingests just what is new or modified since the last run, using a
+  manifest at `%USERPROFILE%\.cowork-memory\ingest-manifest.json` (override with
+  `--manifest` or `INGEST_MANIFEST`). A full pass re-embeds everything and takes
+  the better part of an hour; an incremental run over the same corpus takes
+  seconds, which is what makes a daily or at-logon refresh practical.
+- Change detection is mtime + size, compared per file against the manifest. The
+  manifest records the scan root, and pointing it at a different folder
+  invalidates it rather than silently skipping files that were never ingested.
+- Files deleted from disk are reported. The brain has no delete endpoint, so
+  their chunks stay searchable until the index is rebuilt -- worth knowing when a
+  retired proposal turns up in a draft.
+- Run a full pass periodically anyway: it is the backstop for an edit that
+  somehow preserved both mtime and size.
 - Supported formats: `.docx`, `.pptx`, `.pdf`, `.txt`, `.md` (extensible in `src/sources/documents.ts`).
 - `.pptx` extraction reads each slide in order and includes speaker notes, which in
   proposal decks often carry the narrative the slide only gestures at. Slides with no
