@@ -51,7 +51,7 @@ async function search(query: string, k = 5): Promise<string[]> {
   });
   if (!res.ok) throw new Error(`Search failed: ${res.status} ${await res.text()}`);
   const data: any = await res.json();
-  return (data.hits ?? []).map((h: any) => `# from ${h.notePath ?? "unknown"}\n${h.text ?? ""}`);
+  return (data.hits ?? []).map((h: any) => `# from ${h.chunk?.notePath ?? "unknown"}\n${h.chunk?.text ?? ""}`);
 }
 
 async function callClaude(content: string): Promise<string> {
